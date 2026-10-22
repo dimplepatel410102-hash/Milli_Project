@@ -1,0 +1,4 @@
+# Optional: needed for MILLI_FACE_DETECTOR=opencv_haar/opencv_yunet and MILLI_FACE_RECOGNITION=true.
+# OpenCV 5 removed CascadeClassifier from the main package, so stay on 4.x.
+-r requirements.txt
+opencv-python-headless>=4.10,<5

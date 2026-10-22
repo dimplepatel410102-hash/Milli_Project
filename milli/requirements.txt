@@ -1,0 +1,14 @@
+# Milli Face Detection Backend — Phase 1
+# Runtime and test dependencies. Install inside the project virtual environment.
+
+fastapi>=0.115.0
+uvicorn>=0.32.0
+pydantic>=2.9.0
+pydantic-settings>=2.6.0
+python-dotenv>=1.0.0
+python-multipart>=0.0.12
+pillow>=10.4.0
+
+# Tests (TestClient needs httpx)
+httpx>=0.27.0
+pytest>=8.0.0

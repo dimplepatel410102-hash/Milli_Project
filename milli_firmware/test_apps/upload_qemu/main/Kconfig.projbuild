@@ -1,0 +1,14 @@
+menu "Milli QEMU upload test"
+    config TEST_SERVER_URL
+        string "Backend URL as seen from QEMU (host is 10.0.2.2)"
+        default "http://10.0.2.2:8000"
+    config TEST_UNREACHABLE_URL
+        string "URL with nothing listening (retry test)"
+        default "http://10.0.2.2:8009"
+    config TEST_DEVICE_ID
+        string "Test device ID"
+        default ""
+    config TEST_DEVICE_API_KEY
+        string "Test device API key"
+        default ""
+endmenu

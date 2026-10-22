@@ -1,0 +1,2 @@
+source C:/ESP32S3/Milli_Iot_Receptionist/build/gdbinit/symbols
+source C:/ESP32S3/Milli_Iot_Receptionist/build/gdbinit/connect

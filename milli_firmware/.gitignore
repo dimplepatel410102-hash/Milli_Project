@@ -1,0 +1,19 @@
+# Build output
+build/
+build_*/
+*.log
+build_log.txt
+
+# Downloaded by the IDF component manager (pinned in dependencies.lock)
+managed_components/
+
+# Local configuration: contains Wi-Fi password and device API key
+sdkconfig
+sdkconfig.old
+*.local
+
+# Editors
+.vscode/
+.idea/
+.cache/
+.clangd

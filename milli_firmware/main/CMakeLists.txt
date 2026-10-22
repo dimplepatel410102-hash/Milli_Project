@@ -1,0 +1,22 @@
+idf_component_register(
+    SRCS
+        "main.c"
+        "network_manager.c"
+        "camera_manager.c"
+        "face_detection.cpp"
+        "capture_policy.c"
+        "image_uploader.c"
+    INCLUDE_DIRS "."
+    PRIV_REQUIRES
+        esp_wifi
+        esp_netif
+        esp_event
+        esp_timer
+        esp_psram
+        esp_http_client
+        esp_app_format
+        esp_hw_support
+        spi_flash
+        nvs_flash
+        mbedtls
+)

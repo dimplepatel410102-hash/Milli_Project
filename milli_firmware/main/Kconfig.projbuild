@@ -1,0 +1,244 @@
+menu "Milli configuration"
+
+    menu "Wi-Fi"
+        config MILLI_WIFI_SSID
+            string "Wi-Fi SSID (2.4 GHz)"
+            default ""
+            help
+                Network name. The ESP32-S3 supports 2.4 GHz networks only.
+
+        config MILLI_WIFI_PASSWORD
+            string "Wi-Fi password"
+            default ""
+            help
+                Leave empty for an open network. Never logged.
+
+        config MILLI_WIFI_MAX_BACKOFF_MS
+            int "Maximum reconnect backoff (ms)"
+            range 1000 300000
+            default 30000
+    endmenu
+
+    menu "Milli backend"
+        config MILLI_SERVER_URL
+            string "MILLI_SERVER_URL"
+            default ""
+            help
+                Base URL of the Phase 1 backend without a trailing slash,
+                e.g. http://192.168.1.50:8000 (development) or https://milli.example.com.
+
+        config MILLI_DEVICE_ID
+            string "MILLI_DEVICE_ID"
+            default ""
+            help
+                Must match an entry in the backend's MILLI_DEVICE_CREDENTIALS.
+
+        config MILLI_DEVICE_API_KEY
+            string "MILLI_DEVICE_API_KEY"
+            default ""
+            help
+                Device API key printed by `python -m app.tools.device_key new <id>`.
+                Sent as X-Device-Key. Never logged.
+
+        config MILLI_CAPTURE_ENDPOINT
+            string "MILLI_CAPTURE_ENDPOINT"
+            default "/api/v1/camera/capture"
+
+        config MILLI_REGISTER_ENDPOINT
+            string "Registration endpoint"
+            default "/api/v1/devices/register"
+
+        config MILLI_HTTP_TIMEOUT_MS
+            int "HTTP timeout (ms)"
+            range 1000 60000
+            default 10000
+
+        config MILLI_UPLOAD_MAX_ATTEMPTS
+            int "Upload attempts for transient failures"
+            range 1 10
+            default 3
+
+        config MILLI_UPLOAD_BACKOFF_MS
+            int "First retry delay (ms), doubled per retry"
+            range 100 30000
+            default 1000
+    endmenu
+
+    menu "Camera pins (GC2145, DVP)"
+        comment "Copy every value from your board's schematic or vendor pin table."
+        comment "-1 means 'not connected'. Nothing here is pre-filled."
+
+        config MILLI_CAM_PINS_VERIFIED
+            bool "I have verified these pins against my board's documentation"
+            default n
+            help
+                The camera stays disabled until this is enabled, so unverified
+                pin numbers are never driven.
+
+        config MILLI_CAM_PIN_PWDN
+            int "PWDN (power-down), -1 if not connected"
+            range -1 48
+            default -1
+        config MILLI_CAM_PIN_RESET
+            int "RESET, -1 if not connected"
+            range -1 48
+            default -1
+        config MILLI_CAM_PIN_XCLK
+            int "XCLK, -1 if the module has its own oscillator"
+            range -1 48
+            default -1
+        config MILLI_CAM_PIN_SIOD
+            int "SIOD (SCCB/I2C SDA)"
+            range -1 48
+            default -1
+        config MILLI_CAM_PIN_SIOC
+            int "SIOC (SCCB/I2C SCL)"
+            range -1 48
+            default -1
+        config MILLI_CAM_PIN_D7
+            int "D7 (Y9)"
+            range -1 48
+            default -1
+        config MILLI_CAM_PIN_D6
+            int "D6 (Y8)"
+            range -1 48
+            default -1
+        config MILLI_CAM_PIN_D5
+            int "D5 (Y7)"
+            range -1 48
+            default -1
+        config MILLI_CAM_PIN_D4
+            int "D4 (Y6)"
+            range -1 48
+            default -1
+        config MILLI_CAM_PIN_D3
+            int "D3 (Y5)"
+            range -1 48
+            default -1
+        config MILLI_CAM_PIN_D2
+            int "D2 (Y4)"
+            range -1 48
+            default -1
+        config MILLI_CAM_PIN_D1
+            int "D1 (Y3)"
+            range -1 48
+            default -1
+        config MILLI_CAM_PIN_D0
+            int "D0 (Y2)"
+            range -1 48
+            default -1
+        config MILLI_CAM_PIN_VSYNC
+            int "VSYNC"
+            range -1 48
+            default -1
+        config MILLI_CAM_PIN_HREF
+            int "HREF"
+            range -1 48
+            default -1
+        config MILLI_CAM_PIN_PCLK
+            int "PCLK"
+            range -1 48
+            default -1
+
+        config MILLI_CAM_XCLK_FREQ_HZ
+            int "XCLK frequency (Hz)"
+            range 6000000 24000000
+            default 20000000
+            help
+                Only used when an XCLK pin is configured.
+    endmenu
+
+    menu "Camera capture"
+        choice MILLI_CAM_FRAME_SIZE
+            prompt "Frame size"
+            default MILLI_CAM_FRAME_QVGA
+            config MILLI_CAM_FRAME_QVGA
+                bool "QVGA 320x240"
+            config MILLI_CAM_FRAME_VGA
+                bool "VGA 640x480"
+        endchoice
+
+        config MILLI_CAM_HMIRROR
+            bool "Mirror horizontally"
+            default n
+        config MILLI_CAM_VFLIP
+            bool "Flip vertically"
+            default n
+    endmenu
+
+    menu "Upload image format"
+        choice MILLI_UPLOAD_FORMAT
+            prompt "Encode RGB565 frames as"
+            default MILLI_UPLOAD_FORMAT_JPEG
+            help
+                GC2145 has no JPEG output and the backend accepts JPEG, PNG, BMP or WEBP,
+                so frames are encoded before upload.
+            config MILLI_UPLOAD_FORMAT_JPEG
+                bool "JPEG (software encoder)"
+            config MILLI_UPLOAD_FORMAT_BMP
+                bool "BMP (uncompressed, larger uploads)"
+        endchoice
+
+        config MILLI_JPEG_QUALITY
+            int "JPEG quality (1-100)"
+            depends on MILLI_UPLOAD_FORMAT_JPEG
+            range 1 100
+            default 80
+    endmenu
+
+    menu "Face detection and capture policy"
+        choice MILLI_MODE
+            prompt "Run mode"
+            default MILLI_MODE_FACE_UPLOAD
+            config MILLI_MODE_FACE_UPLOAD
+                bool "Face detection; upload on detection"
+            config MILLI_MODE_CAMERA_TEST
+                bool "Camera test only (no detection, no upload)"
+        endchoice
+
+        config MILLI_FACE_MIN_SCORE_PCT
+            int "Minimum face score (percent)"
+            range 1 100
+            default 50
+
+        config MILLI_FACE_CONFIRM_FRAMES
+            int "Consecutive face frames before a face counts as present"
+            range 1 30
+            default 2
+
+        config MILLI_FACE_ABSENT_FRAMES
+            int "Consecutive empty frames before a face counts as gone"
+            range 1 100
+            default 5
+
+        config MILLI_CAPTURE_COOLDOWN_MS
+            int "Re-upload interval while the same face stays in view (ms, 0 = never)"
+            range 0 3600000
+            default 30000
+
+        config MILLI_MIN_UPLOAD_INTERVAL_MS
+            int "Minimum time between any two uploads (ms)"
+            range 0 600000
+            default 5000
+
+        config MILLI_PERIODIC_UPLOAD_MS
+            int "Also upload a frame every N ms without a detected face (0 = off)"
+            depends on MILLI_MODE_FACE_UPLOAD
+            range 0 3600000
+            default 0
+            help
+                For bench testing: lets the backend check image quality and run its own
+                face detection and recognition even when on-device detection finds nothing.
+    endmenu
+
+    menu "Time"
+        config MILLI_SNTP_ENABLE
+            bool "Sync time with SNTP (enables X-Captured-At)"
+            default y
+        config MILLI_SNTP_SERVER
+            string "SNTP server"
+            depends on MILLI_SNTP_ENABLE
+            default "pool.ntp.org"
+    endmenu
+
+endmenu
